@@ -15,7 +15,7 @@ async sendOtp(email: string) {
 const existing = await this.prisma.user.findUnique({ where: { email } });
 if (existing) throw new BadRequestException('Email already registered');
 
-```
+
 const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
 await this.prisma.otp.create({
@@ -24,8 +24,7 @@ await this.prisma.otp.create({
 
 await this.mail.sendOtp(email, otp);
 
-return { message: 'OTP sent successfully' };
-```
+return { message: 'OTP sent successfully' }
 
 }
 
@@ -35,7 +34,7 @@ where: { email, code: otp },
 orderBy: { createdAt: 'desc' },
 });
 
-```
+
 if (!otpRecord)
   throw new BadRequestException('Invalid OTP');
 
@@ -56,14 +55,14 @@ const user = await this.prisma.user.create({
 await this.prisma.otp.delete({ where: { id: otpRecord.id } });
 
 return { message: 'User registered successfully', user };
-```
+
 
 }
 
 async login(email: string, password: string) {
 const user = await this.prisma.user.findUnique({ where: { email } });
 
-```
+
 if (!user)
   throw new BadRequestException('User not found');
 
@@ -79,7 +78,7 @@ const token = jwt.sign(
 );
 
 return { token };
-```
+
 
 }
 }
