@@ -48,7 +48,7 @@ if (expired)
 const hashed = await bcrypt.hash(password, 10);
 
 const user = await this.prisma.user.create({
-  data: { email, password: hashed },
+  data: { email, passwordHash: hashed },
 });
 
 // delete OTP after use
@@ -66,7 +66,7 @@ const user = await this.prisma.user.findUnique({ where: { email } });
 if (!user)
   throw new BadRequestException('User not found');
 
-const valid = await bcrypt.compare(password, user.password);
+const valid = await bcrypt.compare(password, user.passwordHash);
 
 if (!valid)
   throw new BadRequestException('Invalid password');

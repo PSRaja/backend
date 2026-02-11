@@ -10,7 +10,7 @@
   "dependencies": {
     "@nestjs/common": "^11.1.13",
     "@nestjs/core": "^11.1.13",
-    "@nestjs/platform-express": "^11.1.12",
+    "@nestjs/platform-express": "^11.1.13",
     "@nestjs/swagger": "^11.2.5",
     "@prisma/client": "^6.19.2",
     "bcrypt": "^6.0.0",
@@ -25,7 +25,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "ts-node main.js",
+    "dev": "ts-node src/main.ts",
     "start": "node dist/main.js",
     "build": "tsc",
     "prisma:generate": "prisma generate"
