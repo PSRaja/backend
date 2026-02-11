@@ -25,8 +25,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "ts-node index.ts",
-    "start": "node dist/index.js",
+    "dev": "ts-node main.js",
+    "start": "node dist/main.js",
     "build": "tsc",
     "prisma:generate": "prisma generate"
   },
