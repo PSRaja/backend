@@ -1,7 +1,7 @@
 import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
-import { PrismaService } from '../prisma/service';
+import { PrismaService } from '../../prisma/service';
 import { MailService } from '../mail/mail.service';
 
 @Injectable()
