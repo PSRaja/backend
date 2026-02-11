@@ -1,84 +1,85 @@
-import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
-import { PrismaService } from '../../prisma/service';
+import { PrismaService } from '../prisma/service';
 import { MailService } from '../mail/mail.service';
 
 @Injectable()
 export class AuthService {
-  constructor(
-    private prisma: PrismaService,
-    private mailService: MailService,
-  ) {}
+constructor(
+private prisma: PrismaService,
+private mail: MailService,
+) {}
 
-  // 1️⃣ SEND OTP BEFORE REGISTER
-  async sendOtp(email: string) {
-    const exists = await this.prisma.user.findUnique({ where: { email } });
-    if (exists) throw new BadRequestException('Email already exists');
+async sendOtp(email: string) {
+const existing = await this.prisma.user.findUnique({ where: { email } });
+if (existing) throw new BadRequestException('Email already registered');
 
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+```
+const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-    // save OTP
-    await this.prisma.otp.create({
-      data: { email, otp },
-    });
+await this.prisma.otp.create({
+  data: { email, code: otp },
+});
 
-    // send mail using Gmail
-    await this.mailService.sendOtpEmail(email, otp);
+await this.mail.sendOtp(email, otp);
 
-    return { message: 'OTP sent to email' };
-  }
+return { message: 'OTP sent successfully' };
+```
 
-  // 2️⃣ REGISTER ONLY AFTER OTP VERIFY
-  async register(email: string, password: string, otp: string) {
-    const otpRecord = await this.prisma.otp.findFirst({
-      where: { email, otp },
-      orderBy: { createdAt: 'desc' },
-    });
+}
 
-    if (!otpRecord) {
-      throw new BadRequestException('Invalid OTP');
-    }
+async register(email: string, password: string, otp: string) {
+const otpRecord = await this.prisma.otp.findFirst({
+where: { email, code: otp },
+orderBy: { createdAt: 'desc' },
+});
 
-    const exists = await this.prisma.user.findUnique({ where: { email } });
-    if (exists) throw new BadRequestException('Email already exists');
+```
+if (!otpRecord)
+  throw new BadRequestException('Invalid OTP');
 
-    const username = email.split('@')[0];
-    const hash = await bcrypt.hash(password, 10);
+// OTP expiry (5 minutes)
+const expired =
+  Date.now() - otpRecord.createdAt.getTime() > 5 * 60 * 1000;
 
-    const user = await this.prisma.user.create({
-      data: {
-        email,
-        username,
-        passwordHash: hash,
-      },
-    });
+if (expired)
+  throw new BadRequestException('OTP expired');
 
-    return { message: 'User registered successfully', userId: user.id };
-  }
+const hashed = await bcrypt.hash(password, 10);
 
-  // 3️⃣ LOGIN
-  async login(loginId: string, password: string) {
-    const user = await this.prisma.user.findFirst({
-      where: {
-        OR: [
-          { email: loginId },
-          { username: loginId },
-        ],
-      },
-    });
+const user = await this.prisma.user.create({
+  data: { email, password: hashed },
+});
 
-    if (!user) throw new UnauthorizedException('User not found');
+// delete OTP after use
+await this.prisma.otp.delete({ where: { id: otpRecord.id } });
 
-    const match = await bcrypt.compare(password, user.passwordHash);
-    if (!match) throw new UnauthorizedException('Invalid password');
+return { message: 'User registered successfully', user };
+```
 
-    const token = jwt.sign(
-      { userId: user.id, email: user.email, username: user.username },
-      'MY_SECRET_KEY',
-      { expiresIn: '1h' },
-    );
+}
 
-    return { message: 'Login success', token };
-  }
+async login(email: string, password: string) {
+const user = await this.prisma.user.findUnique({ where: { email } });
+
+```
+if (!user)
+  throw new BadRequestException('User not found');
+
+const valid = await bcrypt.compare(password, user.password);
+
+if (!valid)
+  throw new BadRequestException('Invalid password');
+
+const token = jwt.sign(
+  { id: user.id, email: user.email },
+  process.env.JWT_SECRET || 'secret',
+  { expiresIn: '1h' },
+);
+
+return { token };
+```
+
+}
 }
