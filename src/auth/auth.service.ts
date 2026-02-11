@@ -47,8 +47,9 @@ if (expired)
 
 const hashed = await bcrypt.hash(password, 10);
 
+const username = email.split('@')[0] + Math.floor(Math.random() * 1000);
 const user = await this.prisma.user.create({
-  data: { email, passwordHash: hashed },
+  data: { email, username, passwordHash: hashed },
 });
 
 // delete OTP after use
