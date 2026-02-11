@@ -8,8 +8,8 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
-    "@nestjs/common": "^11.1.12",
-    "@nestjs/core": "^11.1.12",
+    "@nestjs/common": "^11.1.13",
+    "@nestjs/core": "^11.1.13",
     "@nestjs/platform-express": "^11.1.12",
     "@nestjs/swagger": "^11.2.5",
     "@prisma/client": "^6.19.2",
@@ -27,7 +27,8 @@
   "scripts": {
     "dev": "ts-node index.ts",
     "start": "node dist/index.js",
-    "build": "tsc"
+    "build": "tsc",
+    "prisma:generate": "prisma generate"
   },
   "author": "",
   "license": "ISC",
