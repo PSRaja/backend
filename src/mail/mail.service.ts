@@ -17,7 +17,7 @@ export class MailService {
 
     await this.apiInstance.sendTransacEmail({
       sender: {
-        email: "yourverifiedemail@gmail.com",  // must verify in Brevo
+        email: "drpsraja@gmail.com",  // must verify in Brevo
         name: "Auth App"
       },
       to: [{ email }],
