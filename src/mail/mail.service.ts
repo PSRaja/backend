@@ -1,22 +1,29 @@
 import { Injectable } from '@nestjs/common';
-import * as nodemailer from 'nodemailer';
+import * as brevo from '@getbrevo/brevo';
 
 @Injectable()
 export class MailService {
-private transporter = nodemailer.createTransport({
-service: 'gmail',
-auth: {
-user: process.env.MAIL_USER,
-pass: process.env.MAIL_PASS,
-},
-});
 
-async sendOtp(email: string, otp: string) {
-await this.transporter.sendMail({
-from: process.env.MAIL_USER,
-to: email,
-subject: 'Your OTP Code',
-text: `Your OTP is: ${otp}`,
-});
-}
+  private apiInstance = new brevo.TransactionalEmailsApi();
+
+  constructor() {
+    this.apiInstance.setApiKey(
+      brevo.TransactionalEmailsApiApiKeys.apiKey,
+      process.env.BREVO_API_KEY,
+    );
+  }
+
+  async sendOtp(email: string, otp: string) {
+
+    await this.apiInstance.sendTransacEmail({
+      sender: {
+        email: "yourverifiedemail@gmail.com",  // must verify in Brevo
+        name: "Auth App"
+      },
+      to: [{ email }],
+      subject: "Your OTP Code",
+      textContent: `Your OTP is: ${otp}`,
+    });
+
+  }
 }
