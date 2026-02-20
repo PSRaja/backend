@@ -22,25 +22,3 @@ const { email, password } = body;
 return this.auth.login(email, password);
 }
 }
-
-
-async function login() {
-  const email = (document.getElementById("loginEmail") as HTMLInputElement).value;
-const password = (document.getElementById("loginPassword") as HTMLInputElement).value;
-
-
-  const response = await fetch("http://localhost:3000/login", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ email, password })
-  });
-
-  if (response.ok) {
-    // Redirect to next page
-    window.location.href = "video.html";
-  } else {
-    alert("Login Failed");
-  }
-}
